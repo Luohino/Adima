@@ -273,17 +273,23 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="relative">
-            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-red-200"></div>
+            {/* Timeline line - hidden on mobile */}
+            <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-red-200"></div>
+            {/* Mobile timeline line */}
+            <div className="md:hidden absolute left-4 h-full w-0.5 bg-red-200"></div>
+            
             {milestones.map((milestone, index) => (
-              <div key={index} className={`relative flex items-center mb-8 ${index % 2 === 0 ? 'justify-start' : 'justify-end'}`}>
-                <div className={`w-5/12 ${index % 2 === 0 ? 'text-right pr-8' : 'text-left pl-8'}`}>
+              <div key={index} className={`relative flex items-center mb-8 md:mb-8 ${index % 2 === 0 ? 'md:justify-start' : 'md:justify-end'}`}>
+                {/* Mobile layout - all cards aligned left */}
+                <div className={`w-full md:w-5/12 pl-10 md:pl-0 ${index % 2 === 0 ? 'md:text-right md:pr-8' : 'md:text-left md:pl-8'}`}>
                   <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
                     <div className="text-red-600 font-bold mb-2">{milestone.year}</div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{milestone.title}</h3>
                     <p className="text-gray-600">{milestone.description}</p>
                   </div>
                 </div>
-                <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-red-600 rounded-full border-4 border-white"></div>
+                {/* Timeline dot */}
+                <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 w-4 h-4 bg-red-600 rounded-full border-4 border-white"></div>
               </div>
             ))}
           </div>
