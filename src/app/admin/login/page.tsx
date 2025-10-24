@@ -30,42 +30,34 @@ export default function AdminLoginPage() {
     setIsLoading(true);
     setError('');
 
-    try {
-      const response = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('adminToken', data.token);
-        localStorage.setItem('adminUser', JSON.stringify(data.admin));
+    // Simple frontend validation
+    if (formData.email === 'admin@adima.com' && formData.password === 'admin123') {
+      // Successful login
+      setTimeout(() => {
+        const adminData = {
+          email: 'admin@adima.com',
+          name: 'Admin User',
+          role: 'admin'
+        };
+        localStorage.setItem('adminToken', 'demo-token-' + Date.now());
+        localStorage.setItem('adminUser', JSON.stringify(adminData));
         toast({
           title: "Login Successful!",
           description: "Welcome to the admin dashboard.",
         });
         router.push('/admin/dashboard');
-      } else {
-        setError(data.message || 'Invalid credentials');
+      }, 800);
+    } else {
+      // Invalid credentials
+      setTimeout(() => {
+        setError('Invalid email or password');
         toast({
           title: "Login Failed",
-          description: data.message || 'Invalid credentials',
+          description: 'Invalid email or password',
           variant: "destructive",
         });
-      }
-    } catch (err) {
-      setError('Something went wrong. Please try again.');
-      toast({
-        title: "Error",
-        description: 'Something went wrong. Please try again.',
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+        setIsLoading(false);
+      }, 800);
     }
   };
 
