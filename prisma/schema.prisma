@@ -1,0 +1,136 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  courses   Course[]
+  coupons   Coupon[]
+  certificates Certificate[]
+  
+  @@map("admins")
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  category    String
+  price       Float
+  duration    String
+  level       String
+  thumbnail   String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  adminId     String
+  admin       Admin     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  
+  coupons     Coupon[]
+  certificates Certificate[]
+  materials   CourseMaterial[]
+  
+  @@map("courses")
+}
+
+model CourseMaterial {
+  id          String   @id @default(cuid())
+  title       String
+  type        String // video, document, link
+  url         String
+  description String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  @@map("course_materials")
+}
+
+model Coupon {
+  id            String    @id @default(cuid())
+  code          String    @unique
+  token         String    @unique
+  courseId      String
+  maxUses       Int       @default(1)
+  currentUses   Int       @default(0)
+  isActive      Boolean   @default(true)
+  expiresAt     DateTime?
+  extendedUntil DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  adminId       String
+  admin         Admin     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  
+  course        Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  usages        CouponUsage[]
+  
+  @@map("coupons")
+}
+
+model CouponUsage {
+  id        String   @id @default(cuid())
+  couponId  String
+  studentName String
+  studentEmail String
+  ipAddress String?
+  userAgent  String?
+  usedAt    DateTime @default(now())
+  
+  coupon    Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  
+  @@map("coupon_usages")
+}
+
+model Certificate {
+  id            String   @id @default(cuid())
+  certificateId String   @unique
+  studentName   String
+  studentEmail  String
+  courseId      String
+  courseTitle   String
+  issueDate     DateTime @default(now())
+  isValid       Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  adminId       String
+  admin         Admin     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  
+  course        Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  @@map("certificates")
+}
+
+model Analytics {
+  id          String   @id @default(cuid())
+  eventType   String // download, coupon_used, certificate_verified
+  eventData   String   // JSON string
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  
+  @@map("analytics")
+}
